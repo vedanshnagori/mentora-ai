@@ -1,0 +1,19 @@
+[project]
+name = "study-assistant"
+version = "0.1.0"
+description = "RAG based personalized study assistant"
+requires-python = ">=3.12"
+dependencies = [
+    "chromadb",
+    "google-genai",
+    "langchain",
+    "langchain-chroma",
+    "langchain-community",
+    "langchain-core",
+    "pdf2image",
+    "pillow",
+    "pydantic",
+    "pymupdf4llm",
+    "python-dotenv",
+    "streamlit"
+]
