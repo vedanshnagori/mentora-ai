@@ -1,9 +1,12 @@
+import base64
 import hashlib
 import io
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from groq import Groq
+
 from google import genai
 from google.genai import types
 from pdf2image import convert_from_path
@@ -28,7 +31,6 @@ Output only the transcribed Markdown without conversational filler.
 """
 
 def calculate_file_hash(file_path: Path) -> str:
-    """Generates an MD5 hash of the file to uniquely identify document versions."""
     hasher = hashlib.md5()
     with open(file_path, "rb") as f:
         while chunk := f.read(8192):
@@ -36,25 +38,25 @@ def calculate_file_hash(file_path: Path) -> str:
     return hasher.hexdigest()
 
 def transcribe_page_image(image_bytes: bytes) -> str:
-    """Sends a single image to Gemini Vision for transcription."""
+    """Transcribes handwritten notes using Gemini 2.0 Flash with an 800-token ceiling."""
     response = client.models.generate_content(
-        model="gemini-1.5-flash",
+        model="gemini-3.6-flash",
         contents=[
             types.Part.from_bytes(data=image_bytes, mime_type="image/png"),
-            VLM_PROMPT
-        ]
+            VLM_PROMPT,
+        ],
+        config=types.GenerateContentConfig(
+            temperature=0.1,
+            max_output_tokens=800,
+        ),
     )
     return response.text or ""
 
 def process_handwritten_pdf(file_path: str | Path, subject_id: str) -> list[Document]:
-    """
-    Renders PDF pages as images, transcribes them via Gemini Vision, 
-    splits the Markdown structurally, and attaches sanitized metadata.
-    """
     file_path = Path(file_path)
     doc_id = calculate_file_hash(file_path)
     
-    # Convert PDF pages to PIL images at 200 DPI
+    # Convert pages to images
     images = convert_from_path(str(file_path), dpi=200)
     
     headers_to_split_on = [
@@ -76,20 +78,16 @@ def process_handwritten_pdf(file_path: str | Path, subject_id: str) -> list[Docu
     global_chunk_idx = 0
 
     for page_num, img in enumerate(images, start=1):
-        # Convert PIL Image to bytes for transmission
         img_buffer = io.BytesIO()
         img.save(img_buffer, format="PNG")
         
         raw_text = transcribe_page_image(img_buffer.getvalue())
-        
         if not raw_text.strip():
             continue
 
-        # Split logically by headers first, then length
         header_docs = markdown_splitter.split_text(raw_text)
         page_docs = text_splitter.split_documents(header_docs)
 
-        # Attach metadata matching the printed pipeline
         for doc in page_docs:
             headers = [
                 doc.metadata.get("Header 1"),
