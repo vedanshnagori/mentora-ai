@@ -1,0 +1,271 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+    --ink: #101E19;
+    --surface: #17271F;
+    --surface-2: #1E3128;
+    --line: #33473C;
+    --paper: #ECE7D8;
+    --paper-dim: #97A398;
+    --gold: #CDA24C;
+    --gold-dim: #7C6738;
+    --sage: #4C6B54;
+    --sage-dim: #33473C;
+    --rose: #C1707A;
+}
+
+/* base canvas */
+[data-testid="stAppViewContainer"],
+[data-testid="stHeader"] {
+    background-color: var(--ink);
+}
+
+[data-testid="stAppViewContainer"] * {
+    font-family: 'Inter', sans-serif;
+    color: var(--paper);
+}
+
+/* keep Streamlit's icon glyphs (expander arrow, upload icon, etc.) rendering
+   as icons, not literal ligature text like "arrow_down" or "upload" */
+[data-testid="stIconMaterial"],
+[data-testid="stExpanderToggleIcon"],
+[data-testid="stFileUploaderDropzoneIcon"],
+span[class*="material-symbols"] {
+    font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', sans-serif !important;
+}
+
+[data-testid="stHeader"] {
+    background: transparent;
+}
+
+.block-container {
+    padding-top: 2.4rem;
+    max-width: 860px;
+}
+
+/* sidebar — the "shelf" */
+[data-testid="stSidebar"] {
+    background-color: var(--surface);
+    border-right: 1px solid var(--line);
+}
+
+[data-testid="stSidebar"] .block-container {
+    padding-top: 2rem;
+}
+
+.mentora-wordmark {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--paper);
+    letter-spacing: 0.01em;
+    margin-bottom: 0.15rem;
+}
+
+.mentora-rule {
+    width: 34px;
+    height: 2px;
+    background: var(--gold);
+    margin-bottom: 1.4rem;
+    border: none;
+}
+
+.mentora-eyebrow {
+    color: var(--paper-dim);
+    font-size: 0.82rem;
+    margin: 1.6rem 0 0.5rem 0;
+}
+
+/* new-subject input */
+[data-testid="stSidebar"] input[type="text"] {
+    background-color: var(--ink);
+    border: 1px solid var(--line);
+    color: var(--paper);
+    border-radius: 6px;
+}
+
+[data-testid="stSidebar"] input[type="text"]:focus {
+    border-color: var(--gold);
+    box-shadow: none;
+}
+
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button {
+    background-color: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    border-radius: 6px;
+    width: 100%;
+}
+
+[data-testid="stSidebar"] [data-testid="stFormSubmitButton"] button:hover {
+    border-color: var(--gold);
+    background-color: rgba(205, 162, 76, 0.08);
+}
+
+/* subject list, styled as a tab shelf rather than radio buttons */
+[data-testid="stSidebar"] [data-testid="stRadio"]>div {
+    gap: 0.15rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label {
+    border-left: 2px solid transparent;
+    padding: 0.4rem 0 0.4rem 0.7rem;
+    border-radius: 0;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
+    border-left: 2px solid var(--gold);
+    background-color: rgba(205, 162, 76, 0.07);
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) p {
+    color: var(--paper);
+    font-weight: 500;
+}
+
+[data-testid="stSidebar"] [data-testid="stRadio"] p {
+    font-size: 0.95rem;
+    color: var(--paper-dim);
+}
+
+/* hide the default circular radio marker — the accent bar carries the state */
+[data-testid="stSidebar"] [data-testid="stRadio"] label>div:first-child {
+    display: none;
+}
+
+/* main header */
+.mentora-header {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 2.1rem;
+    line-height: 1.15;
+    margin-bottom: 0.2rem;
+}
+
+.mentora-caption {
+    color: var(--paper-dim);
+    font-size: 0.9rem;
+    margin-bottom: 1.6rem;
+}
+
+/* ingest panel */
+[data-testid="stExpander"] {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+[data-testid="stExpander"] summary {
+    font-size: 0.95rem;
+    padding: 0.7rem 1rem;
+}
+
+[data-testid="stFileUploaderDropzone"] {
+    background-color: var(--ink);
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+}
+
+[data-testid="stFileUploaderDropzone"] * {
+    color: var(--paper-dim) !important;
+}
+
+div[data-testid="stExpander"] [data-testid="stRadio"] label {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 0.3rem 0.9rem;
+    margin-right: 0.4rem;
+}
+
+div[data-testid="stExpander"] [data-testid="stRadio"] label:has(input:checked) {
+    border-color: var(--gold);
+    background-color: rgba(205, 162, 76, 0.1);
+}
+
+div[data-testid="stExpander"] [data-testid="stRadio"] label>div:first-child {
+    display: none;
+}
+
+div[data-testid="stExpander"] [data-testid="stRadio"]>div {
+    flex-direction: row;
+}
+
+.stButton button,
+[data-testid="stFormSubmitButton"] button {
+    background-color: var(--sage);
+    color: var(--paper);
+    border: none;
+    border-radius: 6px;
+}
+
+.stButton button:hover {
+    background-color: #5b7d64;
+    color: var(--paper);
+}
+
+/* chat messages */
+[data-testid="stChatMessage"] {
+    background: transparent;
+    border: none;
+    padding: 0.3rem 0;
+    gap: 0.6rem;
+}
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+    flex-direction: row-reverse;
+}
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stChatMessageContent"] {
+    background-color: var(--sage-dim);
+    border-radius: 12px 12px 2px 12px;
+    padding: 0.7rem 1rem;
+    max-width: 80%;
+    margin-left: auto;
+}
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) [data-testid="stChatMessageContent"] {
+    background-color: var(--surface);
+    border-left: 2px solid var(--gold);
+    border-radius: 2px 10px 10px 2px;
+    padding: 0.7rem 1rem;
+    max-width: 88%;
+}
+
+[data-testid="stChatMessageAvatarUser"],
+[data-testid="stChatMessageAvatarAssistant"] {
+    background-color: var(--surface-2);
+}
+
+/* citations */
+[data-testid="stExpander"] .stMarkdown strong {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--gold);
+    font-weight: 500;
+}
+
+[data-testid="stExpander"] .stCaption {
+    color: var(--paper-dim);
+    border-left: 1px solid var(--line);
+    padding-left: 0.6rem;
+}
+
+/* chat input */
+[data-testid="stChatInput"] {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+[data-testid="stChatInput"] textarea {
+    color: var(--paper);
+}
+
+hr {
+    border-color: var(--line);
+}

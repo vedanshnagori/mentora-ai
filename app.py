@@ -8,10 +8,30 @@ from src.ingest_handwritten import process_handwritten_pdf
 from src.rag_engine import add_documents_to_db, ask_study_assistant
 
 st.set_page_config(
-    page_title="Mentora AI - Study Assistant",
-    page_icon="🎓",
+    page_title="Mentora — Study Assistant",
+    page_icon="🕮",
     layout="wide"
 )
+
+# ---------------------------------------------------------------------------
+# Visual identity
+#
+# Mentora is a study companion built around one idea: your own notes and
+# textbooks, indexed and answerable. The look borrows from the reading room
+# rather than the SaaS dashboard — ink, paper, and a gold marginal note —
+# because that's the world this product actually lives in.
+#
+# Styling lives in static/style.css so design tweaks don't require touching
+# the app logic below.
+# ---------------------------------------------------------------------------
+def load_css(path: str) -> None:
+    css_file = Path(path)
+    if css_file.exists():
+        st.markdown(f"<style>{css_file.read_text()}</style>", unsafe_allow_html=True)
+    else:
+        st.warning(f"Stylesheet not found at {path} — using Streamlit defaults.")
+
+load_css("static/style.css")
 
 # 1. State Management
 if "subjects" not in st.session_state:
@@ -27,12 +47,13 @@ if current_sub not in st.session_state.messages:
 
 # 2. Sidebar: Subject Manager
 with st.sidebar:
-    st.title("📚 Subjects")
-    
+    st.markdown('<div class="mentora-wordmark">Mentora</div>', unsafe_allow_html=True)
+    st.markdown('<hr class="mentora-rule">', unsafe_allow_html=True)
+
     with st.form(key="new_subject_form", clear_on_submit=True):
-        new_sub_input = st.text_input("Create New Subject:")
-        submit_button = st.form_submit_button("Add Subject")
-        
+        new_sub_input = st.text_input("New subject", placeholder="e.g. Thermodynamics", label_visibility="collapsed")
+        submit_button = st.form_submit_button("Add subject")
+
         if submit_button and new_sub_input.strip():
             clean_name = new_sub_input.strip()
             if clean_name not in st.session_state.subjects:
@@ -41,69 +62,72 @@ with st.sidebar:
                 st.session_state.current_subject = clean_name
                 st.rerun()
 
-    st.markdown("---")
+    st.markdown('<div class="mentora-eyebrow">Your subjects</div>', unsafe_allow_html=True)
     selected = st.radio(
-        "Select Active Workspace:",
+        "Select active workspace",
         options=st.session_state.subjects,
-        index=st.session_state.subjects.index(st.session_state.current_subject)
+        index=st.session_state.subjects.index(st.session_state.current_subject),
+        label_visibility="collapsed",
     )
     if selected != st.session_state.current_subject:
         st.session_state.current_subject = selected
         st.rerun()
 
 # 3. Main Workspace Area
-st.title(f"🎓 Mentora AI: {current_sub}")
-st.caption(f"Currently scoped to '{current_sub}'. Documents uploaded here remain strictly isolated.")
+st.markdown(f'<div class="mentora-header">{current_sub}</div>', unsafe_allow_html=True)
+st.markdown(
+    f'<div class="mentora-caption">Answers here are grounded only in what you\'ve added to {current_sub} — nothing else leaks in.</div>',
+    unsafe_allow_html=True,
+)
 
 # File Ingestion Widget
-with st.expander("📥 Upload & Ingest Study Material", expanded=False):
+with st.expander("Add material to this subject", expanded=False):
     col1, col2 = st.columns([1, 2])
     with col1:
         doc_type = st.radio(
-            "Material Type:",
-            ["Printed Textbook / Slides", "Handwritten Notes"],
-            help="Choose 'Printed' for clean digital PDFs (parsed via PyMuPDF4LLM), or 'Handwritten' for scans (parsed via Gemini Vision)."
+            "Material type",
+            ["Printed", "Handwritten"],
+            help="Printed: clean digital PDFs, parsed via PyMuPDF4LLM. Handwritten: scanned notes, parsed via Gemini Vision.",
+            label_visibility="collapsed",
         )
     with col2:
-        uploaded_file = st.file_uploader("Select PDF file to index", type=["pdf"])
+        uploaded_file = st.file_uploader("Select a PDF", type=["pdf"], label_visibility="collapsed")
 
-    if st.button("Index Document into Subject") and uploaded_file is not None:
-        with st.spinner("Extracting content, chunking, and updating vector index..."):
-            # Save temporary file for local readers
+    if st.button("Index this document") and uploaded_file is not None:
+        with st.spinner("Reading, chunking, and indexing..."):
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             try:
-                if doc_type == "Printed Textbook / Slides":
+                if doc_type == "Printed":
                     chunks = process_printed_pdf(tmp_path, current_sub)
                 else:
                     chunks = process_handwritten_pdf(tmp_path, current_sub)
 
                 add_documents_to_db(chunks)
-                st.success(f"Successfully processed and indexed {len(chunks)} chunks into '{current_sub}'!")
+                st.success(f"Indexed {len(chunks)} passages into {current_sub}.")
             except Exception as e:
-                st.error(f"Error indexing document: {e}")
+                st.error(f"Couldn't index this document: {e}")
             finally:
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)
 
 # 4. Chat History Rendering
 for msg in st.session_state.messages[current_sub]:
-    with st.chat_message(msg["role"]):
+    avatar = "🙂" if msg["role"] == "user" else "🕮"
+    with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(msg["content"])
 
 # 5. Query Handling & Generation
-user_input = st.chat_input(f"Ask any question about {current_sub}...")
+user_input = st.chat_input(f"Ask something about {current_sub}...")
 if user_input:
-    # Append & display user prompt
     st.session_state.messages[current_sub].append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="🙂"):
         st.markdown(user_input)
 
-    # Generate assistant response
-    with st.chat_message("assistant"):
-        with st.spinner("Analyzing your study materials..."):
+    with st.chat_message("assistant", avatar="🕮"):
+        with st.spinner("Checking your materials..."):
             try:
                 response_text, sources = ask_study_assistant(
                     query=user_input,
@@ -113,16 +137,15 @@ if user_input:
                 st.markdown(response_text)
 
                 if sources:
-                    with st.expander("🔍 Cited Material Context"):
+                    with st.expander("Sourced from"):
                         for i, doc in enumerate(sources, start=1):
                             meta = doc.metadata
                             st.markdown(
-                                f"**Chunk {i}** — `{meta.get('source_file', 'Doc')}` "
-                                f"(Page: {meta.get('page_number', 'N/A')}, Section: *{meta.get('section_path', 'General')}*)"
+                                f"**{i:02d} · {meta.get('source_file', 'Doc')}** — "
+                                f"p.{meta.get('page_number', 'N/A')}, {meta.get('section_path', 'General')}"
                             )
                             st.caption(doc.page_content[:300] + ("..." if len(doc.page_content) > 300 else ""))
 
-                # Append assistant response to current subject's history
                 st.session_state.messages[current_sub].append({"role": "assistant", "content": response_text})
             except Exception as err:
-                st.error(f"Failed to generate response: {err}")
+                st.error(f"Couldn't generate a response: {err}")
