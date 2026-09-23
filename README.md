@@ -1,6 +1,6 @@
 # Mentora AI - Personalized Agentic Study Assistant
 
-Mentora AI is a syllabus-grounded, pedagogical study companion designed to eliminate the friction of manual, page-by-page document ingestion[cite: 3]. It ingests complete digital textbooks and scanned handwritten notes into partitioned workspaces, delivering high-speed tutoring grounded with exact document and page citations[cite: 1, 2].
+Mentora AI is a syllabus-grounded, pedagogical study companion designed to eliminate the friction of manual, page-by-page document ingestion. It ingests complete digital textbooks and scanned handwritten notes into partitioned workspaces, delivering high-speed tutoring grounded with exact document and page citations.
 
 ---
 
@@ -34,26 +34,26 @@ Mentora AI is a syllabus-grounded, pedagogical study companion designed to elimi
 ## Key Features
 
 - **Dual-Track Document Ingestion:**
-  - **Digital PDFs:** Preserves tables, headers, and multi-column layouts as structured Markdown using `pymupdf4llm`[cite: 2].
-  - **Handwritten Notes:** Converts pages to high-DPI images with `pdf2image` and transcribes them via Gemini Vision, preserving LaTeX formulas ($...$) and diagram descriptions[cite: 2].
-- **Structural Heading-Based Chunking:** Splits text along Markdown header hierarchies (`#`, `##`, `###`), attaching exact page numbers, content-derived MD5 hashes (`doc_id`), and section breadcrumbs to metadata[cite: 2].
-- **Subject-Isolated Vector Store:** Partitions ChromaDB storage using strict metadata filters (`where={"subject_id": active_subject}`) to eliminate cross-subject retrieval contamination[cite: 2].
-- **Pedagogical Grounded Tutoring:** Generates conversational explanations with verified source citations (`[filename, p. X]`) and closes explanations with comprehension checks[cite: 2].
-- **Agentic CRAG Ready:** Supports Corrective RAG routing to self-evaluate retrieval relevance and eliminate hallucinations[cite: 1, 6].
+  - **Digital PDFs:** Preserves tables, headers, and multi-column layouts as structured Markdown using `pymupdf4llm`.
+  - **Handwritten Notes:** Converts pages to high-DPI images with `pdf2image` and transcribes them via Gemini Vision, preserving LaTeX formulas ($...$) and diagram descriptions.
+- **Structural Heading-Based Chunking:** Splits text along Markdown header hierarchies (`#`, `##`, `###`), attaching exact page numbers, content-derived MD5 hashes (`doc_id`), and section breadcrumbs to metadata.
+- **Subject-Isolated Vector Store:** Partitions ChromaDB storage using strict metadata filters (`where={"subject_id": active_subject}`) to eliminate cross-subject retrieval contamination.
+- **Pedagogical Grounded Tutoring:** Generates conversational explanations with verified source citations (`[filename, p. X]`) and closes explanations with comprehension checks.
+- **Agentic CRAG Ready:** Supports Corrective RAG routing to self-evaluate retrieval relevance and eliminate hallucinations.
 
 ---
 
 ## Tech Stack
 
-- **Orchestration & LLM Framework:** LangChain, Google GenAI SDK[cite: 2]
+- **Orchestration & LLM Framework:** LangChain, Google GenAI SDK
 - **Inference Models:** 
-  - Vision & OCR: Gemini 2.5 Flash / Groq Vision[cite: 2]
-  - Tutoring & Synthesis: Groq `llama-3.3-70b-versatile` / Gemini 2.5 Flash[cite: 2]
-- **Embeddings:** `BAAI/bge-small-en-v1.5` (via `sentence-transformers`) / `gemini-embedding-001`[cite: 2]
-- **Vector Database:** ChromaDB[cite: 2]
-- **Document Processing:** PyMuPDF4LLM, pdf2image, Pillow[cite: 2]
-- **Frontend / Application Server:** Streamlit[cite: 2]
-- **Package Manager:** `uv`[cite: 2]
+  - Vision & OCR: Gemini 2.5 Flash / Groq Vision
+  - Tutoring & Synthesis: Groq `llama-3.3-70b-versatile` / Gemini 2.5 Flash
+- **Embeddings:** `gemini-embedding-001`
+- **Vector Database:** ChromaDB
+- **Document Processing:** PyMuPDF4LLM, pdf2image, Pillow
+- **Frontend / Application Server:** Streamlit
+- **Package Manager:** `uv`
 
 ---
 
